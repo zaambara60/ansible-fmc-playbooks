@@ -1,7 +1,9 @@
 - hosts: all
   connection: httpapi
+  collections:
+    - cisco.fmcansible
   vars_files:
-    - vars.yml
+    - vars.yml  
   tasks:
     - name: Get Domain
       cisco.fmcansible.fmc_configuration:
