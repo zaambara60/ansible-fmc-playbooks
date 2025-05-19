@@ -1,0 +1,95 @@
+- name: CrÃ©er un VPN P2P entre FTD0 et FTD1
+  hosts: all
+  connection: httpapi
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Get Domain UUID
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Get Device List (FTDs)
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: "{{ domain[0].uuid }}"
+        register_as: device_list
+
+    - name: Get Physical Interfaces for FTD0
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          domainUUID: "{{ domain[0].uuid }}"
+          containerUUID: "{{ device_list[0].id }}"
+        register_as: ftd0_interfaces
+
+    - name: Get Physical Interfaces for FTD1
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          domainUUID: "{{ domain[0].uuid }}"
+          containerUUID: "{{ device_list[1].id }}"
+        register_as: ftd1_interfaces
+
+    - name: Extract FTD0 outside IP
+      set_fact:
+        ftd0_ip: "{{ item.ip.address }}"
+      loop: "{{ ftd0_interfaces }}"
+      when: item.name == "outside"
+
+    - name: Extract FTD1 outside IP
+      set_fact:
+        ftd1_ip: "{{ item.ip.address }}"
+      loop: "{{ ftd1_interfaces }}"
+      when: item.name == "outside"
+
+    - name: Create Site-to-Site VPN P2P
+      cisco.fmcansible.fmc_configuration:
+        operation: createFTDS2SVpnModel
+        path_params:
+          domainUUID: "{{ domain[0].uuid }}"
+        data:
+          name: "VPN-FTD0-FTD1"
+          topologyType: "P2P"
+          routeBased: true
+          ikeV2Enabled: true
+          ikeV1Enabled: false
+          endpoints:
+            local:
+            - name: "FTD0"
+              ipAddress: "{{ ftd0_ip }}"
+              interface:
+                name: "outside"
+              protectedNetworks:
+                - name: "app-lb"
+            remote:
+            - name: "FTD1"
+              ipAddress: "{{ ftd1_ip }}"
+              interface:
+                name: "outside"
+              protectedNetworks:
+                - name: "default-gateway55"
+          ikeSettings:
+            version: "IKEv2"
+            authenticationMethod: "PreSharedKey"
+            preSharedKey: "{{ vpn_pre_shared_key }}"
+            encryptionAlgorithms:
+              - AES_256
+            integrityAlgorithms:
+              - SHA_256
+            dhGroup: "Group14"
+            lifetimeInSeconds: 86400
+          ipsecSettings:
+            encryptionAlgorithms:
+              - AES_256
+            integrityAlgorithms:
+              - SHA_256
+            pfsSetting: "Group14"
+            lifetimeInSeconds: 3600
+          advancedSettings:
+            enableDeadPeerDetection: true
+            dpdTimeout: 30
+            dpdRetries: 3

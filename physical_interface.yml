@@ -1,0 +1,45 @@
+- hosts: all
+  connection: httpapi
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Get Domain
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Get Devices
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: device_list
+
+    - name: Get Physical Interfaces
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          containerUUID: '{{ device_list[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: physical_interfaces
+
+    - name: Setup Outside Interface with static IP
+      cisco.fmcansible.fmc_configuration:
+        operation: updateFTDPhysicalInterface
+        data:
+          ifname: outside
+          ipv4:
+            static:
+              address: "{{ outside_ip | default('192.168.10.4') }}"
+              netmask: "{{ outside_netmask | default('255.255.255.0') }}"
+          MTU: 1500
+          enabled: True
+          mode: NONE
+          type: physicalinterface
+          name: GigabitEthernet0/0
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+          containerUUID: '{{ device_list[0].id }}'
+          objectId: '{{ physical_interfaces[0].id }}'
+
+    

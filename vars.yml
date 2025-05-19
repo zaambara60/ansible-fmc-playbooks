@@ -1,0 +1,152 @@
+#------------------------------------------------------
+## Access_policy create
+#------------------------------------------------------
+accesspolicy_name: "AccesPolicy1"
+
+#------------------------------------------------------
+## Access_policy delete
+#------------------------------------------------------
+delete_accesspolicy_name: "AccesPolicy1"
+
+#------------------------------------------------------
+## Access_rule_with_logging_create
+#------------------------------------------------------
+accessrule_name: "rule1"
+
+#------------------------------------------------------
+## Access_rule_with_networks
+#------------------------------------------------------
+networkobject_name: "ansibleadd"
+networkobject_ip: "192.35.62.45"
+accesspolicy_name: "AccesPolicy1"
+
+#------------------------------------------------------
+## Access_rule_delete
+#------------------------------------------------------
+#delete_accesspolicy_name
+#delete_accessrule_name
+
+#------------------------------------------------------
+## Data_dns_settings
+#------------------------------------------------------
+dnsserevergroup_name: "value"
+dnsserver1_ip: "192.65.65.36"
+dnsserver2_ip: "192.168.32.35"
+
+#------------------------------------------------------
+## Dnsserevergroup_create
+#------------------------------------------------------
+dnsserevergroup_name: "value"
+dnsserver1_ip: "192.65.65.36"
+dnsserver2_ip: "192.168.32.35"
+
+#------------------------------------------------------
+## Dnsserevergroup_delete
+#------------------------------------------------------
+#delete_dnservergroupobject_name: "dns"
+
+#------------------------------------------------------
+## Device_registration
+#------------------------------------------------------
+ftd_ip: "192.168.1.1"
+reg_key: "vansible"
+ftd_name: "ansible1"
+nat_id: ""
+
+#------------------------------------------------------
+## Nat_create
+#------------------------------------------------------
+nat_polycy_name: "value"
+
+#------------------------------------------------------
+## Natpolicy_delete
+#------------------------------------------------------
+delete_natpolicy_name: "natpol1"
+
+#------------------------------------------------------
+## Natrule_delete
+#------------------------------------------------------
+delete_natpolicy_name: "natpol1"
+delete_natrule_name: "rule1"
+
+#------------------------------------------------------
+## Network_object
+#------------------------------------------------------
+networkobject_ftd1_name: "via ansible1"
+networkobject_ftd2_value: "10.112.45.3"
+networkobject_ftd1_name: "via ansible2"
+networkobject_ftd2_value: "172.32.65.34"
+networkgroup_name: "value"
+
+#------------------------------------------------------
+## Physical_interface
+#------------------------------------------------------
+inside_ip: "10.10.10.10"
+inside_netmask: "24"
+outside_ip: "20.20.20.20"
+outside_netmask: "24"
+
+#------------------------------------------------------
+## Prefilter_policy_create
+prefilterpolicy_name: "value"
+
+#------------------------------------------------------
+## Prefilter_policy_delete
+#------------------------------------------------------
+delete_prefilterpolicy_name: "pol1"
+
+#------------------------------------------------------
+## Prefilter_rule_delete
+#------------------------------------------------------
+delete_prefilterpolicy_name: "pol1"
+delete_prefilterrule_name: "rule1"
+
+#------------------------------------------------------
+## Static_route
+#------------------------------------------------------
+firstdestinationnetwork: "value"
+seconddestinationnetwork: "value"
+gatewaynetwork: "value"
+
+#------------------------------------------------------
+## Sub_interface
+#------------------------------------------------------
+subinterface_ip: "10.10.10.10"
+subinterface_netmask: "24"
+
+#------------------------------------------------------
+## Security_zones_create
+#------------------------------------------------------
+securityzone_name: "secz1a"
+
+#------------------------------------------------------
+## Security_zone_delete
+#------------------------------------------------------
+delete_securityzone_name: "secz1a"
+firstdestinationnetwork: "192.168.10.0/24"
+seconddestinationnetwork: "192.168.20.0/24"
+gatewaynetwork: "192.168.1.1"
+outside_ip: 192.168.10.4
+outside_netmask: 255.255.255.0
+inside_ip: 192.168.20.2
+inside_netmask: 255.255.255.0
+# Identifiant du routeur EIGRP
+router_id: "1.1.1.1"
+
+# Réseau à ajouter au processus EIGRP
+eigrp_network: "192.168.0.0/24"
+
+# AS EIGRP (Autonomous System)
+eigrp_as: 100
+
+# IP statique à attribuer à l'interface GigabitEthernet0/2
+#outside_ip: 192.168.30.4
+#outside_netmask: 255.255.255.0
+
+# Adresse IP pour l'interface VTI (point à point)
+vti_ip: 10.0.0.1
+vti_netmask: 255.255.255.252
+vpn_name: "FTD0-FTD1-VPN-P2P"
+vpn_pre_shared_key: "SecretPSK2025"
+ftd0_ip: "172.21.0.1"
+ftd1_ip: "172.21.1.1"

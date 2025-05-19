@@ -1,0 +1,77 @@
+- hosts: all
+  connection: httpapi
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Get Domain
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Get Devices
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: device_list
+
+    - name: Get Physical Interfaces
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          containerUUID: '{{ device_list[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: physical_interfaces
+
+    - name: Configure GigabitEthernet0/2 with static IP
+      cisco.fmcansible.fmc_configuration:
+        operation: updateFTDPhysicalInterface
+        data:
+          ifname: outside5
+          ipv4:
+            static:
+              address: "{{ outside_ip | default('192.168.30.4') }}"
+              netmask: "{{ outside_netmask | default('255.255.255.0') }}"
+          MTU: 1500
+          enabled: true
+          mode: NONE
+          type: PhysicalInterface
+          name: GigabitEthernet0/2
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+          containerUUID: '{{ device_list[0].id }}'
+          objectId: '{{ physical_interfaces[2].id }}'  # Assurez-vous que l'index est correct
+
+    - name: Get Security Zones
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllSecurityZoneObject
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: zones
+
+    - name: Create VTI Interface
+      cisco.fmcansible.fmc_configuration:
+        operation: createMultipleFTDVTIInterface
+        data:
+          type: VTIInterface
+          ifname: tunnel-5
+          tunnelId: 5
+          tunnelType: STATIC
+          enabled: true
+          tunnelSource:
+            id: '{{ physical_interfaces[2].id }}'
+            name: "GigabitEthernet0/2"
+            type: PhysicalInterface
+          ipv4:
+            static:
+              address: "{{ vti_ip | default('10.0.0.1') }}"
+              netmask: "{{ vti_netmask | default('255.255.255.252') }}"
+          ipsecMode: ipv4
+          securityZone:
+            id: '{{ zones[0].id }}'
+            type: SecurityZone
+            links:
+              self: '{{ zones[0].links.self }}'
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+          containerUUID: '{{ device_list[0].id }}'

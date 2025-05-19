@@ -1,0 +1,48 @@
+- hosts: all
+  connection: httpapi
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Get Domain
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Get Devices
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: device_list
+
+    - name: Get Device Interfaces
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          containerUUID: '{{ device_list[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        query_params:
+          expanded: true
+        register_as: interface_list
+
+    - name: Setup OSPF Configuration
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertOSPFModel
+        data:
+          name: "OSPF_Config"
+          routerId: "{{ router_id | default('1.1.1.1') }}"
+          networks:
+            - network: "{{ ospf_network | default('192.168.0.0/24') }}"
+              area: "{{ ospf_area | default('0.0.0.0') }}"
+          interfaces:
+            - name: "{{ interface_list[0].ifname }}"
+              cost: 10
+        path_params:
+          containerUUID: '{{ device_list[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+
+    - name: Commit OSPF Configuration
+      cisco.fmcansible.fmc_configuration:
+        operation: commit
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
