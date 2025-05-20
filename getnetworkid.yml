@@ -1,0 +1,36 @@
+- name: Retrieve devices and network objects from FMC
+  hosts: all
+  connection: httpapi
+  collections:
+    
+    - cisco.fmcansible
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Get Domain UUID
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Get all devices
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: devices
+
+    - name: Display all FMC devices
+      debug:
+        var: devices
+
+    - name: Get all network objects
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllNetworkObject
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: networks
+
+    - name: Display all network objects
+      debug:
+        var: networks
