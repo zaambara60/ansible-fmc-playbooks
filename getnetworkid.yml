@@ -2,7 +2,6 @@
   hosts: all
   connection: httpapi
   collections:
-    
     - cisco.fmcansible
   vars_files:
     - vars.yml
