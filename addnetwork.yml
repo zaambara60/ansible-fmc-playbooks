@@ -1,6 +1,8 @@
 - name: Create a new network object
   hosts: all
   connection: httpapi
+  collections:
+    - cisco.fmcansible
   gather_facts: no
   vars_files:
     - vars.yml
