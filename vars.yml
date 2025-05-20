@@ -17,7 +17,7 @@ accessrule_name: "rule1"
 ## Access_rule_with_networks
 #------------------------------------------------------
 networkobject_name: "ansibleadd"
-networkobject_ip: "192.35.62.45"
+networkobject_ip: "192.20.20.0/24"
 accesspolicy_name: "AccesPolicy1"
 
 #------------------------------------------------------
