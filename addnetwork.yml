@@ -1,0 +1,22 @@
+- name: Create a new network object
+  hosts: all
+  connection: httpapi
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Get Domain UUID
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+
+    - name: Create a network object
+      cisco.fmcansible.fmc_configuration:
+        operation: createMultipleNetworkObject
+        data:
+          name: MyNetwork
+          value: 192.168.50.0/24
+          type: Network
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
